@@ -81,7 +81,7 @@ func (c *Conn) Join(channel string) error {
 	data := map[string]string{"channel": channel}
 	m := &Message{
 		Action: "join_channel",
-		Data: data,
+		Data:   data,
 	}
 	return c.sendJsonData(m)
 }
@@ -90,7 +90,7 @@ func (c *Conn) Leave(channel string) error {
 	data := map[string]string{"channel": channel}
 	m := &Message{
 		Action: "leave_channel",
-		Data: data,
+		Data:   data,
 	}
 	return c.sendJsonData(m)
 }
