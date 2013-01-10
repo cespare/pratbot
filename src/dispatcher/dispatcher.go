@@ -40,6 +40,9 @@ func (d *Dispatcher) SendRaw(msg string) {
 		}
 		event.Type = bot.EventPublishMessage
 		event.Payload = *m
+		// Ignore these message types for now
+	case "pong", "join_channel", "leave_channel", "user_active", "user_offline":
+		return
 	default:
 		log.Println("Received unhandled message type:", typ.Type)
 		return

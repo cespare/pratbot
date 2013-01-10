@@ -20,6 +20,7 @@ func NewEcho(conn *connection.Conn) Bot {
 func (b *Echo) Handle(e *Event) {
 	switch e.Type {
 	case EventConnect:
+		b.conn.Leave("general") // quick hack until there's an API for current channels
 		for _, c := range channels {
 			b.conn.Join(c)
 		}

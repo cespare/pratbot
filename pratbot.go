@@ -26,9 +26,12 @@ var (
 type newBotFunc func(*connection.Conn) bot.Bot
 
 var (
-	botNameToFunc = map[string]newBotFunc{"echo": bot.NewEcho}
-	bots          = make(map[string]newBotFunc)
-	disp          = dispatcher.New()
+	botNameToFunc = map[string]newBotFunc{
+		"echo":   bot.NewEcho,
+		"commit": bot.NewCommit,
+	}
+	bots = make(map[string]newBotFunc)
+	disp = dispatcher.New()
 )
 
 func init() {
@@ -82,6 +85,8 @@ func main() {
 	for _, f := range bots {
 		disp.Register(f(conn))
 	}
+
+	log.Println("Bots started.")
 
 	// Send 'connected' message
 	connectedMsg := &bot.Event{

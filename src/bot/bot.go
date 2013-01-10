@@ -3,6 +3,7 @@ package bot
 type EventType int
 
 const (
+	_                      = iota // So that the uninitialized message isn't accidentally valid
 	EventConnect EventType = iota
 	EventPublishMessage
 )

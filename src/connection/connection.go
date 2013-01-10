@@ -86,6 +86,15 @@ func (c *Conn) Join(channel string) error {
 	return c.sendJsonData(m)
 }
 
+func (c *Conn) Leave(channel string) error {
+	data := map[string]string{"channel": channel}
+	m := &Message{
+		Action: "leave_channel",
+		Data: data,
+	}
+	return c.sendJsonData(m)
+}
+
 func Connect(addrString, apiKey, secret string) (*Conn, error) {
 	origin := "http://localhost/"
 	config, err := websocket.NewConfig(authutil.ConnectionString(addrString, apiKey, secret), origin)
