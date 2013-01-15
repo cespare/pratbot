@@ -10,14 +10,30 @@ import (
 	"authutil"
 )
 
-var PingFrequency = 30 * time.Second
+var (
+	PingFrequency = 30 * time.Second
+	// TODO: exponential backoff
+	ReconnectFrequency = 10 * time.Second
+)
 
 func (c *Conn) receive() {
 	for {
 		var msg string
 		if err := websocket.Message.Receive(c.ws, &msg); err != nil {
 			log.Println("Error receiving message:", err)
-			continue
+			// TODO:
+			// * Put the sleeping in the reconnection function itself
+			// * Also do this when there's a send failure
+			// * Don't try to send or receive at all when we're disconnected
+			for {
+				err := c.reconnect()
+				if err == nil {
+					log.Println("Reconnection successful.")
+					break
+				}
+				log.Println("Reconnection failed:", err)
+				time.Sleep(ReconnectFrequency)
+			}
 		}
 		c.In <- msg
 	}
@@ -47,11 +63,16 @@ func (c *Conn) send() {
 	}
 }
 
+type credentials struct {
+	addrString, apiKey, secret string
+}
+
 type Conn struct {
 	ws *websocket.Conn
 	// Messages come out here
-	In  chan string
-	out chan string
+	In    chan string
+	out   chan string
+	creds *credentials
 }
 
 type Message struct {
@@ -95,24 +116,40 @@ func (c *Conn) Leave(channel string) error {
 	return c.sendJsonData(m)
 }
 
-func Connect(addrString, apiKey, secret string) (*Conn, error) {
-	origin := "http://localhost/"
-	config, err := websocket.NewConfig(authutil.ConnectionString(addrString, apiKey, secret), origin)
+func (c *Conn) connect() error {
+	config, err := websocket.NewConfig(
+		authutil.ConnectionString(c.creds.addrString, c.creds.apiKey, c.creds.secret),
+		"http://localhost/",
+	)
 	if err != nil {
-		return nil, err
+		return err
 	}
 	// Ignore certs for now
 	config.TlsConfig = &tls.Config{InsecureSkipVerify: true}
 	ws, err := websocket.DialConfig(config)
 	if err != nil {
+		return err
+	}
+	c.ws = ws
+	return nil
+}
+
+func (c *Conn) reconnect() error {
+	if err := c.connect(); err != nil {
+		return err
+	}
+	// TODO: shouldn't have a hard-coded channel for this, but instead a configurable status channel.
+	c.SendMessage("pratbot", "Pratbot reconnected.")
+	return nil
+}
+
+func Connect(addrString, apiKey, secret string) (*Conn, error) {
+	conn := &Conn{creds: &credentials{addrString, apiKey, secret}}
+	if err := conn.connect(); err != nil {
 		return nil, err
 	}
-
-	conn := &Conn{
-		ws:  ws,
-		In:  make(chan string),
-		out: make(chan string),
-	}
+	conn.In = make(chan string)
+	conn.out = make(chan string)
 
 	// Start goroutines
 	go conn.receive()
