@@ -182,6 +182,15 @@ func (b *Github) IssueLookup(channel, msg string) {
 		b.SendIssueError(channel, "Error fetching issue info.")
 		return
 	}
+	switch resp.StatusCode {
+	case 200:
+	case 404:
+		b.Send(channel, "No such issue.")
+		return
+	default:
+		b.SendIssueError(channel, "Error fetching issue info.")
+		return
+	}
 	r := &issueResponse{}
 	var buf bytes.Buffer
 	io.Copy(&buf, resp.Body)
