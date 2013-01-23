@@ -9,26 +9,23 @@ var channels = []string{"bot-test"}
 
 type Echo struct {
 	conn *connection.Conn
+	ui *UserInfo
 }
 
-func NewEcho(conn *connection.Conn) Bot {
-	return &Echo{
-		conn: conn,
-	}
+func NewEcho(conn *connection.Conn, ui *UserInfo) Bot {
+	return &Echo{conn, ui}
 }
 
 func (b *Echo) Handle(e *Event) {
 	switch e.Type {
 	case EventConnect:
-		b.conn.Leave("general") // quick hack until there's an API for current channels
 		for _, c := range channels {
 			b.conn.Join(c)
 		}
 	case EventPublishMessage:
 		m := e.Payload.(PublishMessage)
-
-		// Ignore our own messages. Hard-code username until we make an API to retrieve this info.
-		if m.Data.Username == "foo" {
+		// Ignore our own message.
+		if m.Data.User.Email == b.ui.User.Email {
 			return
 		}
 

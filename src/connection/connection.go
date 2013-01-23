@@ -117,10 +117,8 @@ func (c *Conn) Leave(channel string) error {
 }
 
 func (c *Conn) connect() error {
-	config, err := websocket.NewConfig(
-		authutil.ConnectionString(c.creds.addrString, c.creds.apiKey, c.creds.secret),
-		"http://localhost/",
-	)
+	connectionString := c.creds.addrString + authutil.SignRequest("/eventhub", c.creds.apiKey, c.creds.secret)
+	config, err := websocket.NewConfig(connectionString, "http://localhost")
 	if err != nil {
 		return err
 	}

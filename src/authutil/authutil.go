@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"crypto/sha256"
 	"encoding/base64"
-	"fmt"
 	"sort"
 	"strconv"
 	"strings"
@@ -51,14 +50,16 @@ func Signature(secret, method, path, body string, params map[string]string) stri
 	return buf.String()[:43]
 }
 
-func ConnectionString(addrString, apiKey, secret string) string {
+// Route needs leading slash, no trailing ?. Example: '/eventhub'
+// TODO: Make this less fragile.
+func SignRequest(route, apiKey, secret string) string {
 	expires := int(time.Now().Unix() + 300)
 	params := map[string]string{"api_key": apiKey, "expires": strconv.Itoa(expires)}
-	signature := Signature(secret, "GET", "/eventhub", "", params)
+	signature := Signature(secret, "GET", route, "", params)
 	params["signature"] = signature
 	var kv []string
 	for k, v := range params {
 		kv = append(kv, k+"="+v)
 	}
-	return fmt.Sprintf("%s/eventhub?%s", addrString, strings.Join(kv, "&"))
+	return route + "?" + strings.Join(kv, "&")
 }

@@ -1,5 +1,17 @@
 package bot
 
+type User struct {
+	Channels []string
+	Username string
+	Gravatar string
+	Email    string
+	Name     string
+}
+
+type UserInfo struct {
+	User *User
+}
+
 type EventType int
 
 const (
@@ -14,6 +26,7 @@ type Event struct {
 	Type EventType
 	// Payload is a struct defined in dispatcher, e.g., PublishMessage
 	Payload interface{}
+	UI      *UserInfo
 }
 
 type Bot interface {
@@ -26,13 +39,9 @@ type MessageType struct {
 
 type PublishMessage struct {
 	Data struct {
-		Username        string
-		Author          string
-		Email           string
+		User *User
 		Channel         string
-		Gravatar        string
 		Datetime        int
 		Message         string
-		RenderedMessage string
 	}
 }
