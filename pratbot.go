@@ -22,11 +22,11 @@ var (
 	server     = flag.String("server", "", "Prat server")
 	apiKey     = flag.String("apikey", "", "Prat API key")
 	secret     = flag.String("secret", "", "Prat API secret")
-	useTls        = flag.Bool("tls", true, "Connect via TLS")
+	useTls     = flag.Bool("tls", true, "Connect via TLS")
 	port       = flag.Int("port", 0, "Port (defaults to 80/443)")
 	botsString = flag.String("bots", "", "Comma-separated list of bots to initialize")
 
-	wsAddr string
+	wsAddr   string
 	httpAddr string
 )
 

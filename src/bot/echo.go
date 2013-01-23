@@ -9,7 +9,7 @@ var channels = []string{"bot-test"}
 
 type Echo struct {
 	conn *connection.Conn
-	ui *UserInfo
+	ui   *UserInfo
 }
 
 func NewEcho(conn *connection.Conn, ui *UserInfo) Bot {

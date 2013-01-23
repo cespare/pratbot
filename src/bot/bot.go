@@ -39,9 +39,9 @@ type MessageType struct {
 
 type PublishMessage struct {
 	Data struct {
-		User *User
-		Channel         string
-		Datetime        int
-		Message         string
+		User     *User
+		Channel  string
+		Datetime int
+		Message  string
 	}
 }
