@@ -28,12 +28,12 @@ var config = struct {
 	Issues map[string]string
 }{
 	Notifications: map[string][]string{
-		"oochat":  {"general", "oochat"},
+		"prat":  {"general", "prat"},
 		"barkeep": {"barkeep"},
 		"pratbot": {"pratbot", "bot-test"},
 	},
 	Issues: map[string]string{
-		"general": "bkad/oochat",
+		"general": "bkad/prat",
 		"pratbot": "cespare/pratbot",
 		"barkeep": "ooyala/barkeep",
 	},
